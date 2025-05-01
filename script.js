@@ -74,21 +74,19 @@ Format the routine with time allocations for each step.`;
   button.disabled = true;
   
   try {    
-    // Make the API call to OpenAI's chat completions endpoint
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Make the API call to Mistral's chat completions endpoint
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [      
+        model: 'mistral-small-latest',
+        messages: [
           { role: 'system', content: `You are a helpful assistant that creates quick, focused daily routines. Always keep routines short, realistic, and tailored to the user's preferences.` },
           { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_completion_tokens: 500
+        ]
       })
     });
     
