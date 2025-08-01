@@ -74,21 +74,20 @@ Format the routine with time allocations for each step.`;
   button.disabled = true;
   
   try {    
-    // Make the API call to OpenAI's chat completions endpoint
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Make the API call to Mistral's chat completions endpoint
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+        'Authorization': `Bearer ${API_KEY}` // Make sure API_KEY is set
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [      
-          { role: 'system', content: `You are a helpful assistant that creates quick, focused daily routines. Always keep routines short, realistic, and tailored to the user's preferences.` },
-          { role: 'user', content: prompt }
+        model: 'mistral-small-latest', // Use Mistral's model
+        messages: [
+          { role: 'user', content: prompt } // Only use the user prompt
         ],
         temperature: 0.7,
-        max_completion_tokens: 500
+        max_tokens: 500 // Use 'max_tokens' for Mistral
       })
     });
     
@@ -98,8 +97,9 @@ Format the routine with time allocations for each step.`;
     
     // Show the result section and display the routine
     document.getElementById('result').classList.remove('hidden');
-    document.getElementById('routineOutput').textContent = routine;
-    
+    // Convert the routine from Markdown to HTML for better display
+    document.getElementById('routineOutput').innerHTML = markdownToHtml(routine);
+
   } catch (error) {
     // If anything goes wrong, log the error and show user-friendly message
     console.error('Error:', error);
@@ -110,3 +110,22 @@ Format the routine with time allocations for each step.`;
     button.disabled = false;
   }
 });
+
+// Simple function to convert Markdown to HTML
+// This is a basic implementation for beginners
+function markdownToHtml(markdown) {
+  // Convert headings
+  let html = markdown.replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                     .replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  // Convert bold and italics
+  html = html.replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+             .replace(/\*(.*?)\*/gim, '<i>$1</i>');
+  // Convert unordered lists
+  html = html.replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>');
+  // Wrap list items in <ul>
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/gim, '<ul>$1</ul>');
+  // Convert line breaks
+  html = html.replace(/\n/g, '<br>');
+  return html.trim();
+}
